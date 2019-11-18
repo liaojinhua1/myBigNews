@@ -53,7 +53,6 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" data-dismiss="modal">确认</button>
-          <!-- <button type="button" class="btn btn-success">确定</button> -->
         </div>
       </div>
     </div>
@@ -64,13 +63,14 @@
     $(function () {
       //给按钮添加点击事件
       $('.input_sub').on('click', function (e) {
-        //点击后获取，获取用户名密码
+        //点击后获取，获取输入框、密码框中输入的用户名密码，要除去用户名和密码的首尾空格
         var userName = $('.input_txt').val().trim();
         var userPwd = $('.input_pass').val().trim();
         //这个按钮是一个submit按钮，会默认跳转，我们需要阻止其默认行为
         e.preventDefault();
         //判断账户密码是否为空
         if (userName == '' || userPwd == '') {
+          //如果为空，模态框的内容显示如下
           $('.modal-body').text('用户名和密码不能为空');
           $('#myModal').modal();
           return;
@@ -80,17 +80,22 @@
           type: 'post',
           url: window.BigNew.user_login,
           // url: 'http://localhost:8080/api/v1/admin/user/login',
+          //发送的参数
           data: {
             username: userName,
             password: userPwd
           },
           success: function (callback) {
+            //判断用户名和密码是否正确
             if (callback.code == 200) {
-              //存储token
+              //当登入成功后，需要将token令牌存储到本地，然后在使用其他的页面的时候，将这个令牌拿出来给别人看，这个令牌用来鉴别我们是否登录
               // console.log(callback);
               window.sessionStorage.setItem('token', callback.token);
+              //
               $('.modal-body').text(callback.msg);
               $('#myModal').modal();
+              //show.bs.modal  show 方法调用之后立即触发该事件。如果是通过点击某个作为触发器的元素，则此元素可以通过事件的 relatedTarget 属性进行访问。
+              //跳转到网页的首页
               $('#myModal').on('hidden.bs.modal', function (e) {
                 window.location.href = './index.html';
               });
