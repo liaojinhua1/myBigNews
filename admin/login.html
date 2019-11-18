@@ -84,6 +84,9 @@
           },
           success: function (callback) {
             if (callback.code == 200) {
+              //存储token
+              // console.log(callback);
+              window.sessionStorage.setItem('token', callback.token);
               $('.modal-body').text(callback.msg);
               $('#myModal').modal();
               $('#myModal').on('hidden.bs.modal', function (e) {
