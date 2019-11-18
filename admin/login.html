@@ -37,6 +37,45 @@
       </form>
     </div>
   </div>
+  <script>
+    // debugger;
+    $(function () {
+      //给按钮添加点击事件
+      $('.input_sub').on('click', function (e) {
+        //点击后获取，获取用户名密码
+        var userName = $('.input_txt').val().trim();
+        var userPwd = $('.input_pass').val().trim();
+        //这个按钮是一个submit按钮，会默认跳转，我们需要阻止其默认行为
+        e.preventDefault();
+        //判断账户密码是否为空
+        if (userName == '' || userPwd == '') {
+          alert('用户名和密码不能为空');
+          return;
+        }
+        //发送ajax请求
+        $.ajax({
+          type: 'post',
+          url: 'http://localhost:8080/api/v1/admin/user/login',
+          data: {
+            username: userName,
+            password: userPwd
+          },
+          success: function (callback) {
+            if (callback.code == 200) {
+              alert('欢迎回家');
+              window.location.href = './index.html';
+              // console.log(callback);
+            } else {
+              alert('输入的用户名或者密码有误');
+            }
+
+          }
+        })
+      })
+    })
+
+  </script>
+
 
 </body>
 
