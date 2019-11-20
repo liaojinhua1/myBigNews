@@ -99,32 +99,46 @@
     <script>
         //入口函数
         $(function () {
-
+            //阻止a标签的默认行为
+            $('a').on('click', function (e) {
+                e.preventDefault();
+            })
             //当页面一加载，获取到文字分类信息，在页面渲染
             getData();
+            //把获取数据的请求封装成函数
             function getData() {
                 $.get({
                     url: window.BigNew.category_list,
                     success: function (res) {
                         // console.log(res);
+                        //把数据渲染到页面中
                         var htmlStr = template('list', res);
                         $('tbody').html(htmlStr);
                     }
                 });
             }
 
+            //模态框取消按钮注册点击事件，点击的时候，将表单中的数据全部清空
+            $('').on('click', function () {
+                //原生的表单对象上有一个方法： reset()用来重置表单的。
+                $('.modal-body form')[0].reset();
+            });
+
             //当点击某个按钮的时候显示模态框，会触发一个事件show.bs.modal
             $('#myModal').on('show.bs.modal', function (e) {
                 // console.log(e.relatedTarget);
                 if (e.relatedTarget == $('#xinzengfenlei')[0]) {
+                    //表示点击的是新增
                     $('#exampleModalLabel').text('新增分类');
                     $('#btn-confirm').addClass('btn-success').removeClass('btn-primary');
                     //当点击新增分类的时候，将模态框中的表单全部重置一次
                     $('.modal-body form')[0].reset();
                 }
                 else {
+                    //表示点击的是编辑
                     $('#exampleModalLabel').text('编辑分类');
                     $('#btn-confirm').addClass('btn-primary').removeClass('btn-success');
+                    //获取当前的元素的id，存起来
                     var cateId = $(e.relatedTarget).attr('data-id');
                     // console.log(id);
                     $.get({
@@ -142,13 +156,16 @@
                         }
                     });
                 };
-
             });
+
             // 给新增按钮添加点击事件
             $('#btn-confirm').on('click', function () {
                 if ($('#btn-confirm').hasClass('btn-success')) {
+                    //表示是新增的模态框
+                    //获取表单中的信息
                     var name = $('#recipient-name').val();
                     var slug = $('#message-text').val();
+                    //发送ajax请求，将新增的数据添加后台数据库中
                     $.post({
                         url: window.BigNew.category_add,
                         data: {
@@ -156,14 +173,19 @@
                             slug: slug
                         },
                         success: function (res) {
-                            getData();
-                            $('#myModal').modal('hide');
+                            if (res.code == 201) {
+                                getData();
+                                $('#myModal').modal('hide');
+                            }
+
                         }
-                    })
+                    });
                 } else {
+                    //表示是编辑的模态框
                     var cateId = $('#categoryId').val();
                     var name = $('#recipient-name').val();
                     var slug = $('#message-text').val();
+                    //发送ajax请求，将新的数据添加到后台数据库中
                     $.post({
                         url: window.BigNew.category_edit,
                         data: {
@@ -179,8 +201,8 @@
                     });
                     // debugger;
                 }
-
             });
+
             //删除事件
             $('tbody').on('click', '.btn-delete', function () {
                 //弹出提示框
