@@ -91,7 +91,7 @@
                 <td class="text-center">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#myModal"
                         class=" btn btn-info btn-xs" data-id="{{$value.id }}">编辑</a>
-                    <a href="javascript:void(0)" class="btn btn-danger btn-xs btn-delete" data-id="{{$value.id }}">删除</a>
+                    <a href="javascript:void(0)" class="btn btn-danger btn-xs delete btn-delete" data-id="{{$value.id }}">删除</a>
                 </td>
             </tr>
             {{ /each }}
@@ -115,7 +115,7 @@
 
             //当点击某个按钮的时候显示模态框，会触发一个事件show.bs.modal
             $('#myModal').on('show.bs.modal', function (e) {
-                console.log(e.relatedTarget);
+                // console.log(e.relatedTarget);
                 if (e.relatedTarget == $('#xinzengfenlei')[0]) {
                     $('#exampleModalLabel').text('新增分类');
                     $('#btn-confirm').addClass('btn-success').removeClass('btn-primary');
@@ -179,9 +179,32 @@
                     });
                     // debugger;
                 }
+
+            });
+            //删除事件
+            $('tbody').on('click', '.btn-delete', function () {
+                //弹出提示框
+                var ans = confirm('是否要删除此数据，删除后不可恢复！！！')
+                //获取当前元素的id
+                var deleteId = $(this).attr('data-id');
+                // console.log($(this));
+                //是否执行删除操作
+                if (ans) {
+                    $.post({
+                        url: window.BigNew.category_delete,
+                        data: {
+                            id: deleteId
+                        },
+                        success: function (res) {
+                            if (res.code == 204) {
+                                getData();
+                            }
+                        }
+                    });
+                }
             });
 
-           
+
         })
     </script>
     <script src="./libs/http.js"></script>
