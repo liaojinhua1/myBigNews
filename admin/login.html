@@ -15,7 +15,6 @@
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <!-- 引入bootstrap的js文件 -->
   <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
-  <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -90,7 +89,7 @@
             if (callback.code == 200) {
               //当登入成功后，需要将token令牌存储到本地，然后在使用其他的页面的时候，将这个令牌拿出来给别人看，这个令牌用来鉴别我们是否登录
               // console.log(callback);
-              window.sessionStorage.setItem('token', callback.token);
+              window.localStorage.setItem('token', callback.token);
               //
               $('.modal-body').text(callback.msg);
               $('#myModal').modal();
@@ -110,8 +109,8 @@
     })
 
   </script>
-
-
+  <!-- 服务器接口地址 -->
+  <script src="./libs/http.js"></script>
 </body>
 
 </html>
