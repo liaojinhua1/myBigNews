@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="./css/iconfont.css">
     <link rel="stylesheet" href="./css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
-
+    <!-- 引入模板引擎js文件 -->
+    <script src="./libs/template-web.js"></script>
 
 </head>
 
@@ -73,8 +74,7 @@
             </div>
         </div>
     </div>
-    <!-- 引入模板引擎js文件 -->
-    <script src="./libs/template-web.js"></script>
+
     <!-- 准备模板 -->
     <!-- 下拉菜单模板 -->
     <script type="text/html" id="category_list">
@@ -82,6 +82,22 @@
         {{each data}}
         <option value="{{$value.id}}">{{$value.name}}</option>
         {{ /each}} 
+    </script>
+    <!-- 文章例表模板 -->
+    <script type="text/html" id="article_query">
+        {{each data.data}}
+            <tr>
+                <td>{{$value.title}}</td>
+                <td>{{$value.author}}</td>
+                <td>{{$value.category}}</td>
+                <td class="text-center">{{$value.date}}</td>
+                <td class="text-center">{{$value.state}}</td>
+                <td class="text-center">
+                    <a href="article_edit.html" class="btn btn-default btn-xs" data-id="{{$value.id}}">编辑</a>
+                    <a href="javascript:void(0);" class="btn btn-danger btn-xs delete" data-id="{{$value.id}}">删除</a>
+                </td>
+            </tr>
+        {{/each}}
     </script>
 
     <script>
@@ -98,6 +114,49 @@
                     $('#selCategory').html(htmlStr);
                 }
             });
+
+            //当前页，为空返回第1页
+            var page = 1;
+            //每页显示条数
+            var perpage = 10;
+            //获取文章类别
+            $.get({
+                url: window.BigNew.article_query,
+                data: {
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val(),
+                    page: page,
+                    perpage: perpage
+                },
+                success: function (res) {
+                    // console.log(res);
+                    var htmlStr = template('article_query', res);
+                    // console.log(htmlStr);
+                    $('tbody').html(htmlStr);
+                }
+            });
+
+            //筛选功能
+            $('#btnSearch').on('click', function (e) {
+                //阻止默认事件：提交表单事件
+                e.preventDefault();
+                $.get({
+                    url: window.BigNew.article_query,
+                    data: {
+                        type: $('#selCategory').val(),
+                        state: $('#selStatus').val(),
+                        page: page,
+                        perpage: perpage
+                    },
+                    success: function (res) {
+                        // console.log(res);
+                        var htmlStr = template('article_query', res);
+                        // console.log(htmlStr);
+                        $('tbody').html(htmlStr);
+                    }
+                });
+            })
+
         })
     </script>
 
