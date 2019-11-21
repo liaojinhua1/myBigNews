@@ -147,11 +147,12 @@
                         state: $('#selStatus').val(),
                     },
                     success: function (backData) {
-                        console.log(backData);
+                        // console.log(backData);
                         //2.3 模板引擎渲染页面
                         $('.table>tbody').html(template('article_list', backData));
                         //加载分页组件
                         loadPagination(backData.data.totalPage, currentPage);
+                        // 当点击页码数的时候，我们要获取到当前的页码数
                     }
                 });
             };
@@ -189,19 +190,19 @@
             3.3 ajax发送请求
             3.4 响应之后刷新页面 
              */
-             $('table>tbody').on('click','.delete',function(){
+            $('table>tbody').on('click', '.delete', function () {
                 $.ajax({
-                    url:BigNew.article_delete,
-                    type:'post',
-                    dataType:'json',
-                    data:{
-                        id:$(this).attr('data-id')
+                    url: BigNew.article_delete,
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        id: $(this).attr('data-id')
                     },
-                    success: function(backData){
-                        if(backData.code == 204){
+                    success: function (backData) {
+                        if (backData.code == 204) {
                             alert('删除成功');
                             window.location.reload();
-                        }else{
+                        } else {
                             alert(backData.msg);
                         };
                     }
@@ -211,9 +212,9 @@
             /*4.发表文章
             设置父窗口 发表文章高亮
              */
-             $('#release_btn').click(function(){
+            $('#release_btn').click(function () {
                 //$() :第一个参数：选择器  第二个参数：document，默认是当前窗口document
-                $('.level02>li:eq(1)',window.parent.document).addClass('active').siblings().removeClass('active');
+                $('.level02>li:eq(1)', window.parent.document).addClass('active').siblings().removeClass('active');
             });
         });
     </script>
