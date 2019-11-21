@@ -15,6 +15,7 @@
     <script src="./libs/template-web.js"></script>
     <!-- 引入分页插件 -->
     <script src="./libs/jquery.twbsPagination.js"></script>
+    <script src="./libs/http.js"></script>
 
 </head>
 
@@ -96,7 +97,7 @@
                 <td class="text-center">{{$value.state}}</td>
                 <td class="text-center">
                     <a href="article_edit.html?id={{$value.id}}" class="btn btn-default btn-xs" >编辑</a>
-                    <a href="javascript:void(0);" class="btn btn-danger btn-xs delete" data-id="{{$value.id}}">删除</a>
+                    <a href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete" data-id="{{$value.id}}">删除</a>
                 </td>
             </tr>
         {{/each}}
@@ -117,12 +118,14 @@
                 }
             });
 
+
             //当前页，为空返回第1页
             var myPage = 1;
             //每页显示条数
             var myPerpage = 10;
             //获取文章类别
             $.get({
+
                 url: window.BigNew.article_query,
                 data: {
                     type: $('#selCategory').val(),
@@ -135,11 +138,13 @@
                     var htmlStr = template('article_query', res);
                     // console.log(htmlStr);
                     $('tbody').html(htmlStr);
+                    // console.log(res.data);
 
                     //分页
                     $('#pagination-demo').twbsPagination({
                         //总页码数
                         totalPages: res.data.totalPage,
+
                         //显示的页码数为7个
                         visiblePages: 7,
                         //修改页码上的文字
@@ -149,25 +154,26 @@
                         last: '尾页',
                         //点击分页栏的时候触发事件
                         onPageClick: function (event, page) {
+                            // console.log(page);
                             //当页码为1的时候不发送ajax请求，减少服务器的压力
-                            if (res.page == 1) {
+                            if (page == 1) {
                                 return;
                             }
                             // 当点击页码数的时候，我们要获取到当前的页码数,给ajax发送请求
-                            myPage = page;
+                            // myPage = page;
+
                             // $('#page-content').text('Page ' + page);
                             $.get({
                                 url: window.BigNew.article_query,
                                 data: {
                                     type: $('#selCategory').val(),
                                     state: $('#selStatus').val(),
-                                    page: myPage,
+                                    page: page,
                                     perpage: myPerpage
                                 },
                                 success: function (res) {
-                                    // console.log(res);
+                                    console.log(res);
                                     var htmlStr = template('article_query', res);
-                                    // console.log(htmlStr);
                                     $('tbody').html(htmlStr);
                                 }
                             })
@@ -175,7 +181,7 @@
                     });
                 }
             });
-
+            // debugger;
             //给筛选按钮注册点击事件，当点击这个按钮的时候筛选数据显示在页面
             $('#btnSearch').on('click', function (e) {
                 //阻止默认事件：提交表单事件
@@ -190,7 +196,7 @@
                         perpage: myPerpage
                     },
                     success: function (res) {
-                        //判断根据条件筛选，是否有数据符合                      
+                        //判断根据条件筛选，是否有数据符合             
                         if (res.code == 200 && res.data.data.length != 0) {
                             // console.log(res);
                             var htmlStr = template('article_query', res);
@@ -201,7 +207,7 @@
                             //更改分页的总页码数   changeTotalPages 设置当前的页码
                             $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1);
                         } else {
-                            $('tbody').html('<tr><td style="text-align: center;color:shyblue;font-size: 50px" colspan=6>没有符合你条件的数据哦~</td></tr>');
+                            $('tbody').html('<tr><td style="text-align: center;color:shyblue;font-size: 30px" colspan=6>没有符合你条件的数据哦~</td></tr>');
                             $('#pagination-demo').hide();
                         }
 
@@ -209,14 +215,45 @@
                 });
             });
 
-            //删除
-
-
-
+            //给删除按钮注册点击事件，当点击这个按钮的时候删除该数据，其他数据显示在页面
+            $('tbody').on('click', '.btn-delete', function () {
+                var deleteId = $(this).attr('data-id');
+                // console.log(deleteId);
+                if (confirm('是否删除本条文章？')) {
+                    $.post({
+                        url: window.BigNew.article_delete,
+                        data: {
+                            id: deleteId
+                        },
+                        success: function (res) {
+                            console.log(res);
+                            if (res.code == 204) {
+                                $.get({
+                                    url: window.BigNew.article_query,
+                                    data: {
+                                        type: $('#selCategory').val(),
+                                        state: $('#selStatus').val(),
+                                        page: myPage,
+                                        perpage: myPerpage
+                                    },
+                                    success: function (res) {
+                                        confirm('删除成功');
+                                        // console.log(res);
+                                        var htmlStr = template('article_query', res);
+                                        // console.log(htmlStr);
+                                        $('tbody').html(htmlStr);
+                                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1);
+                                    }
+                                })
+                            }
+                        }
+                    });
+                }
+            })
         })
     </script>
 
-    <script src="./libs/http.js"></script>
+
 
 </body>
 
