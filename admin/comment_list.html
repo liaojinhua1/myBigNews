@@ -27,14 +27,14 @@
         <div class="container-fluid common_con">
             <table class="table table-striped table-bordered table-hover mp20">
                 <thead>
-                    <!-- <tr>
+                    <tr>
                         <th>作者</th>
                         <th>评论</th>
                         <th>评论在</th>
                         <th>提交于</th>
                         <th>状态</th>
                         <th class="text-center" width="100">操作</th>
-                    </tr> -->
+                    </tr>
                 </thead>
                 <tbody>
                     <!-- <tr>
@@ -182,14 +182,14 @@
                 <td>{{$value.date}} {{$value.time}}</td>
                 <td>{{$value.state}}</td>
                 <td class="text-center">
-                    {{if $value.state    == '待审核'}}
-                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-xs btn-info">批准</a>
-                    {{else if  $value.state    == '已通过'}}
-                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-warning btn-xs">拒绝</a>
-                    {{else if  $value.state    == '已拒绝'}}
-                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-xs btn-primary">通过</a>
+                    {{if $value.state == '待审核'}}
+                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-xs btn-info btn-pass">批准</a>
+                    {{else if  $value.state == '已通过'}}
+                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-warning btn-xs btn-refuse">拒绝</a>
+                    {{else if  $value.state == '已拒绝'}}
+                    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-xs btn-primary btn-pass">通过</a>
                     {{/if}}
-                    <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
                 </td>
             </tr>
         {{/each}}
@@ -217,7 +217,6 @@
                         $('#pagination-demo').twbsPagination({
                             //总页码数
                             totalPages: res.data.totalPage,
-
                             //显示的页码数为7个
                             visiblePages: 7,
                             //修改页码上的文字
@@ -228,11 +227,13 @@
                             //显示当前的页码
                             onPageClick: function (event, page) {
                                 //当前的页码数
-                                console.log(page);
+                                // console.log(page);
+                                myPage = page;
+                                // console.log(myPage);
                                 $.get({
                                     url: window.BigNew.comment_list,
                                     data: {
-                                        page: page,
+                                        page: myPage,
                                         perpage: mypPerpage
                                     },
                                     success: function (res) {
@@ -245,8 +246,136 @@
                         })
                     }
                 }
+            })
+
+
+            //删除事件
+            $('tbody').on('click', '.btn-delete', function (e) {
+                // console.log(1);
+                e.preventDefault();
+                //获取当前评论的id
+                var id = $(this).attr('data-id');
+                if (confirm('确定要删除这条数据吗？')) {
+                    //发送删除ajax请求
+                    $.post({
+                        url: window.BigNew.comment_delete,
+                        data: {
+                            id: id
+                        },
+                        success: function (res) {
+                            if (res.code == 200) {
+                                alert(res.msg);
+                                $.get({
+                                    url: window.BigNew.comment_list,
+                                    data: {
+                                        page: mypPage,
+                                        perpage: mypPerpage
+                                    },
+                                    success: function (res) {
+                                        if (res.code == 200) {
+                                            console.log(res);
+                                            var htmlStr = template('comment_list', res);
+                                            $('tbody').html(htmlStr);
+                                            // console.log(res.data.totalPage);
+                                            // console.log(res.data.totalCount);
+                                            // console.log(res.data.totalPage / res.data.totalCount);
+                                            // console.log(Math.ceil(res.data.totalPage / res.data.totalCount));
+                                            // var nowPage = Math.ceil(res.data.totalPage / res.data.totalCount);
+                                            //刷新页码
+                                            $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1);
+                                        }
+                                    }
+
+                                });
+                            }
+                            // console.log(res);
+                        }
+                    });
+                }
             });
-            
+            //批准事件
+            $('tbody').on('click', '.btn-pass', function (e) {
+                e.preventDefault();
+                // console.log(this);
+                // console.log($(this).attr('data-id'));
+                //获取当前评论的id
+                var id = $(this).attr('data-id');
+                //发送通过ajax请求
+                $.post({
+                    url: window.BigNew.comment_pass,
+                    data: {
+                        id: id
+                    },
+                    success: function (res) {
+                        if (res.code == 200) {
+                            alert(res.msg);
+                            // console.log(res);
+                            // totalCount: 7992
+                            // totalPage: 800
+                            // window.location.reload();
+                            console.log(mypPage);
+
+                            $.get({
+                                url: window.BigNew.comment_list,
+                                data: {
+                                    page: mypPage,
+                                    perpage: mypPerpage
+                                },
+                                success: function (res) {
+                                    if (res.code == 200) {
+                                        // console.log(res);
+                                        var htmlStr = template('comment_list', res);
+                                        $('tbody').html(htmlStr);
+                                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypPage);
+                                    }
+                                }
+
+                            });
+                        }
+                        // console.log(res);
+                    }
+                });
+            });
+            //拒绝
+            $('tbody').on('click', '.btn-refuse', function (e) {
+                // console.log(1);
+                e.preventDefault();
+                //获取当前评论的id
+                var id = $(this).attr('data-id');
+                //发送删除ajax请求
+                $.post({
+                    url: window.BigNew.comment_reject,
+                    data: {
+                        id: id
+                    },
+                    success: function (res) {
+                        if (res.code == 200) {
+                            alert(res.msg);
+                            // window.location.reload();
+                            $.get({
+                                url: window.BigNew.comment_list,
+                                data: {
+                                    page: mypPage,
+                                    perpage: mypPerpage
+                                },
+                                success: function (res) {
+                                    if (res.code == 200) {
+                                        // console.log(mypPage);
+                                        // console.log(res);
+                                        var htmlStr = template('comment_list', res);
+                                        $('tbody').html(htmlStr);
+                                        //刷新页码
+                                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypPage);
+                                    }
+                                }
+
+                            });
+                        }
+                        // console.log(res);
+                    }
+                });
+
+            });
 
 
         })
