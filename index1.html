@@ -56,7 +56,7 @@
     <div class="main_con clearfix">
         <div class="left_con">
             <ul class="focus_list">
-                <!-- <li class="first">
+                <li class="first">
                     <a href="#"><img src="images/pic01.jpg" alt=""></a>
                     <p>图片说明</p>
                 </li>
@@ -75,7 +75,7 @@
                 <li>
                     <a href="#"><img src="images/pic06.jpg" alt=""></a>
                     <p>图片说明</p>
-                </li> -->
+                </li>
             </ul>
 
             <div class="common_title">
@@ -84,7 +84,7 @@
             </div>
 
             <div class="common_news">
-                <!-- <div class="common_news_list">
+                <div class="common_news_list">
                     <a href="#" class="list_pic"><img src="images/pic09.jpg" alt=""></a>
                     <h4><a href="#">亚马逊金融试水中国？背后却是和华尔街的“金融战争” </a></h4>
                     <p>亚马逊抛弃了中国的买家们，却难以割舍庞大的卖家市场，有消息指出亚马逊中国将针对中国庞大的卖家群体推出一项贷款推荐计划。在连续对印度、墨西哥等新兴市场大力推广线上支付服务后，亚马逊金融试水进军中国市场的信号终于被放出。
@@ -117,7 +117,7 @@
                         <span>标签：财经&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( 5
                             )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( 10 )</span>
                         <b>发布于 2018-08-30 12:18:58</b>
-                    </div> 
+                    </div>
                 </div>
 
                 <div class="common_news_list">
@@ -142,7 +142,7 @@
                             )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( 10 )</span>
                         <b>发布于 2018-08-30 12:18:58</b>
                     </div>
-                </div>-->
+                </div>
             </div>
 
         </div>
@@ -222,68 +222,153 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
         <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
-    <!-- 引入地址文件 -->
-    <script src="./js/http.js"></script>
-    <!-- 引入jQuery文件 -->
-    <script src="./js/jquery-1.12.4.min.js"></script>
-    <!-- 引入模板引擎 -->
+
+    <!-- 导入模板引擎js文件 -->
     <script src="./js/template-web.js"></script>
-    <!-- 热点图模板 -->
-    <script type="text/html" id="hotpic">
-        {{each data as v index}}
-            {{if index==0}}
-            <li class="first">
+    <!-- 引入jq文件 -->
+    <script src="./js/jquery-1.12.4.min.js"></script>
+
+    <!-- 1.热门焦点 -->
+    <script id="focus_news" type="text/html">
+        {{each data}}
+            {{if $index == 0}}
+                <li class="first">
             {{else}}
-            <li>
+                <li>
             {{/if}}
-                <a href="./article.html?id={{v.id}}" ><img src="{{v.cover}}" alt=""></a>
-                <p>{{v.title}}</p>
-            </li>
+                    <a href="./article.html?id={{$value.id}}"><img src="{{$value.cover}}" alt=""></a>
+                    <p>{{$value.title}}</p>
+                </li>
         {{/each}}
     </script>
-    <!-- 最新资讯模板 -->
-    <!-- v.intro 数据中中包含标签 渲染到页面上的时候要识别标签 需要在模板数据前面加  @  ---{{@ v.intro}}  -->
-    <script type="text/html" id="latest">
-        {{each data v}}
+
+    <!-- 2.分类列表 -->
+    <script id="cat_list" type="text/html">
+        <li class="up"></li>
+        {{ each data v }}
+        <li><a href="./list.html?id={{ v.id }}&name={{ v.name }}">{{ v.name }}</a></li>
+        {{ /each }}
+    </script>
+
+    <!-- 3.最新资讯 -->
+    <!-- 新闻列表模板 -->
+    <script id="news" type="text/html">
+        {{ each data v }}
         <div class="common_news_list">
-            <a href="#" class="list_pic"><img src="{{v.cover}}" alt=""></a>
-                <h4><a href="./article.html?id={{v.id}}">{{v.title}}</a></h4>
-                <p>{{@ v.intro}}</p>
-                <div class="new_info">
-                    <span>标签：{{ v.category }}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}} )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{v.comments}} )</span>
-                    <b>{{v.date}}</b>
-                </div>
-                </div>
-        {{/each}}
+            <a href="#" class="list_pic"><img src="{{ v.cover }}" alt=""></a>
+            <h4><a href="./article.html?id={{ v.id }}">{{ v.title }}</a></h4>
+            <p>{{@ v.intro }}</p>
+            <div class="new_info">
+                <span>标签：{{ v.category }}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{ v.read }}
+                    )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{ v.comments }} )</span>
+                <b>{{ v.date }}</b>
+            </div>
+        </div>
+        {{ /each }}
     </script>
+
+    <!-- 4.热门排行 -->
+    <script id="rank" type="text/html">
+        {{ each data v}}
+        <li><span class="first">1</span><a href="./article.html?id={{ v.id }}">{{ v.title }}</a></li>
+        {{ /each }}
+    </script>
+
+    <!-- 5.最新评论 -->
+    <script id="comment" type="text/html">
+        {{ each data v}}
+        <li>
+            <span>{{ v.author.substr(0,1) }}</span>
+            <b><em>{{ v.author }}</em> {{ v.date }}说:</b>
+            <strong>{{ v.intro }}</strong>
+        </li>
+        {{ /each }}
+    </script>
+
+    <!-- 6.焦点关注 -->
+    <script id="guanzhu" type="text/html">
+        {{ each data v}}
+        <li>
+            <a href="javascript:void(0);">{{ v.intro }}</a>
+        </li>
+        {{ /each }}
+    </script>
+
     <script>
-        //入口函数
+        // 入口函数
         $(function () {
-            //发送ajax请求，获取热图
-            $.get({
-                url: window.BigNew.hotpic,
-                success: function (res) {
-                    // console.log(res);
-                    var htmlStr = template('hotpic', res);
-                    $('.focus_list').html(htmlStr);
+            //需求: 显示焦点新闻
+            //1.一进到前台首页页面,就发送ajax请求,获取焦点新闻数据.
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8080/api/v1/index/hotpic',
+                success: function (backData) {
+                    console.log(backData);
+                    //2.通过模板引擎渲染到前台首页上
+                    //  第一个li标签添加first类.
+                    var resHtml = template('focus_news', backData);
+                    $('.focus_list').html(resHtml);
                 }
             });
-            //发送ajax请求，获取最新资讯
-            $.get({
-                url: window.BigNew.latest,
-                success: function (res) {
-                    // var htmlStr = template('latest', res);
-                    // $('.common_news').html(htmlStr);
-                    console.log(res);
+
+            //2.加载分类列表
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8080/api/v1/index/category',
+                success: function (backData) {
+                    console.log(backData);
+                    $('.level_two').html(template('cat_list', backData));
                 }
             });
-            
+
+            //3.最新咨询
+            //ajax请求
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/latest',
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    $('.common_news').html(template('news', backData));
+                }
+            });
+
+            //4.热门排行
+            //ajax请求
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/rank',
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    $('.hotrank_list').html(template('rank', backData));
+                }
+            });
+
+            //5.最新评论
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/latest_comment',
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    $('.comment_list').html(template('comment', backData));
+                }
+            });
+
+            //6.焦点关注
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/index/attention',
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    console.log(backData);
+                    $('.guanzhu_list').html(template('guanzhu', backData));
+                }
+            });
 
 
-
-        })
-
-
+        });
     </script>
 </body>
 
