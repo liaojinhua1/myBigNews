@@ -180,6 +180,8 @@
                 fd.append("id", editId);
                 fd.append("content", editor.txt.html());
                 fd.append("state", "已发布");
+                console.log(fd);
+                console.log(form);
                 $.post({
                     url: window.BigNew.article_edit,
                     data: fd,
